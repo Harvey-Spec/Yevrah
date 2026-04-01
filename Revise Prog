@@ -1,0 +1,237 @@
+import java.util.*;
+
+public class Main {
+
+    static ArrayList<String> names = new ArrayList<>();
+    static ArrayList<String> documents = new ArrayList<>();
+    static ArrayList<String> status = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) { // MAIN LOOP (LOGIN SYSTEM)
+
+            System.out.println("\n=== Barangay Cugman Document Request System ===");
+
+            // LOGIN MENU
+            System.out.println("1. Admin Login");
+            System.out.println("2. Resident");
+            System.out.println("3. Exit Program");
+            System.out.print("Choose: ");
+            int loginChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            String role = "";
+            String currentUser = "";
+
+            // EXIT SYSTEM
+            if (loginChoice == 3) {
+                System.out.println("System closed.");
+                return;
+            }
+
+            // ================= ADMIN LOGIN =================
+            if (loginChoice == 1) {
+
+                String username;
+
+                // USERNAME LOOP
+                while (true) {
+                    System.out.print("Enter Admin Username: ");
+                    username = scanner.nextLine();
+
+                    if (username.equals("Admin")) {
+                        break;
+                    } else {
+                        System.out.println("Invalid username! Must be 'Admin'. Try again.\n");
+                    }
+                }
+
+                // PASSWORD LOOP ONLY
+                while (true) {
+                    System.out.print("Enter Password: ");
+                    String password = scanner.nextLine();
+
+                    if (password.equals("1234")) {
+                        role = "admin";
+                        System.out.println("Logged in as ADMIN");
+                        break;
+                    } else {
+                        System.out.println("Invalid password! Try again.\n");
+                    }
+                }
+            }
+
+            // ================= RESIDENT LOGIN =================
+            else if (loginChoice == 2) {
+
+                while (true) {
+                    System.out.print("Enter your name: ");
+                    currentUser = scanner.nextLine();
+
+                    if (currentUser.matches("[a-zA-Z ]+")) {
+                        break;
+                    } else {
+                        System.out.println("Invalid name! Letters only.");
+                    }
+                }
+
+                role = "user";
+                System.out.println("Welcome, " + currentUser + "!");
+            }
+
+            else {
+                System.out.println("Invalid choice!");
+                continue;
+            }
+
+            // ================= MENU LOOP =================
+            while (true) {
+                System.out.println("\n=== MENU ===");
+
+                if (role.equals("user")) {
+                    System.out.println("1. Request Document");
+                    System.out.println("2. View My Requests");
+                    System.out.println("3. Exit");
+                } else {
+                    System.out.println("1. View All Requests");
+                    System.out.println("2. Update Request Status");
+                    System.out.println("3. Logout");
+                }
+
+                System.out.print("Choose: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+
+                // ================= RESIDENT =================
+                if (role.equals("user")) {
+                    switch (choice) {
+                        case 1:
+                            requestDocument(scanner, currentUser);
+                            break;
+                        case 2:
+                            viewUserRequests(currentUser);
+                            break;
+                        case 3:
+                            System.out.println("Returning to main menu...\n");
+                            break;
+                        default:
+                            System.out.println("Invalid choice!");
+                            continue;
+                    }
+                    break; // 🔥 return to login
+                }
+
+                // ================= ADMIN =================
+                else {
+                    switch (choice) {
+                        case 1:
+                            viewRequests();
+                            break;
+                        case 2:
+                            updateStatus(scanner);
+                            break;
+                        case 3:
+                            System.out.println("Logging out...\n");
+                            break;
+                        default:
+                            System.out.println("Invalid choice!");
+                            continue;
+                    }
+                    break; // 🔥 return to login
+                }
+            }
+        }
+    }
+
+    // ================= REQUEST =================
+    public static void requestDocument(Scanner scanner, String name) {
+
+        System.out.println("1. Barangay Clearance");
+        System.out.println("2. Certificate of Residency");
+        System.out.print("Choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        String doc = "";
+
+        if (choice == 1) doc = "Barangay Clearance";
+        else if (choice == 2) doc = "Certificate of Residency";
+        else {
+            System.out.println("Invalid!");
+            return;
+        }
+
+        names.add(name);
+        documents.add(doc);
+        status.add("Pending");
+
+        System.out.println("Request submitted!");
+    }
+
+    // ================= VIEW ALL =================
+    public static void viewRequests() {
+        if (names.isEmpty()) {
+            System.out.println("No requests found.");
+            return;
+        }
+
+        System.out.println("\n--- All Requests ---");
+        for (int i = 0; i < names.size(); i++) {
+            System.out.println(i + ". " + names.get(i)
+                    + " | " + documents.get(i)
+                    + " | " + status.get(i));
+        }
+    }
+
+    // ================= VIEW USER =================
+    public static void viewUserRequests(String currentUser) {
+        boolean found = false;
+
+        System.out.println("\n--- My Requests ---");
+        for (int i = 0; i < names.size(); i++) {
+            if (names.get(i).equalsIgnoreCase(currentUser)) {
+                System.out.println(i + ". " + names.get(i)
+                        + " | " + documents.get(i)
+                        + " | " + status.get(i));
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No requests found.");
+        }
+    }
+
+    // ================= UPDATE =================
+    public static void updateStatus(Scanner scanner) {
+        viewRequests();
+
+        if (names.isEmpty()) return;
+
+        System.out.print("Enter request number: ");
+        int i = scanner.nextInt();
+        scanner.nextLine();
+
+        if (i < 0 || i >= names.size()) {
+            System.out.println("Invalid!");
+            return;
+        }
+
+        System.out.println("1. Approved");
+        System.out.println("2. Rejected");
+        System.out.println("3. Completed");
+        System.out.print("Choice: ");
+        int choice = scanner.nextInt();
+
+        if (choice == 1) status.set(i, "Approved");
+        else if (choice == 2) status.set(i, "Rejected");
+        else if (choice == 3) status.set(i, "Completed");
+        else {
+            System.out.println("Invalid!");
+            return;
+        }
+
+        System.out.println("Status updated!");
+    }
+}
