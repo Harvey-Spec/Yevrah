@@ -219,7 +219,7 @@ public class BarangayCugmanSystem {
     }
 
     static void requestDoc(int index) {
-        System.out.println("\n1. Clearance 2. Permit 3. Residency 4. Indigency");
+        System.out.println("\n1.  Barangay Clearance 2. Barangay Permit 3. Certificate of Residency 4. Certificate of Indigency");
         int choice = readInt();
 
         String doc = "";
