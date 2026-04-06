@@ -9,6 +9,7 @@ public class BarangayCugmanSystem {
     static ArrayList<String> birthMonths = new ArrayList<>();
     static ArrayList<String> civilStatuses = new ArrayList<>();
     static ArrayList<String> addresses = new ArrayList<>();
+    static ArrayList<String> contacts = new ArrayList<>();
     static ArrayList<String> docs = new ArrayList<>();
     static ArrayList<String> status = new ArrayList<>();
     
@@ -69,23 +70,74 @@ public class BarangayCugmanSystem {
     static void residentMenu() {
         System.out.println("=== RESIDENT REGISTRATION ===");
         
-        System.out.print("Full Name: ");
-        String fullName = sc.nextLine();
-        
-        System.out.print("Age: ");
-        String ageInput = sc.nextLine();
-        
-        System.out.print("Gender (Male/Female): ");
-        String genderInput = sc.nextLine();
-        
-        System.out.print("Birth Month: ");
-        String birthMonthInput = sc.nextLine();
-        
-        System.out.print("Civil Status (Single/Married/Widow): ");
-        String civilStatusInput = sc.nextLine();
-        
-        System.out.print("Address: ");
-        String addressInput = sc.nextLine();
+        // NAME
+        String fullName;
+        while (true) {
+            System.out.print("Full Name: ");
+            fullName = sc.nextLine();
+            if (!fullName.trim().isEmpty()) break;
+            else System.out.println("Invalid! Name cannot be empty.");
+        }
+
+        // AGE
+        String ageInput;
+        while (true) {
+            System.out.print("Age: ");
+            ageInput = sc.nextLine();
+            if (ageInput.matches("\\d+")) break;
+            else System.out.println("Invalid! Age must be a number.");
+        }
+
+        // GENDER
+        String genderInput;
+        while (true) {
+            System.out.print("Gender (Male/Female): ");
+            genderInput = sc.nextLine();
+            if (genderInput.equalsIgnoreCase("Male") || genderInput.equalsIgnoreCase("Female")) {
+                break;
+            } else {
+                System.out.println("Invalid! Enter Male or Female only.");
+            }
+        }
+
+        // BIRTH MONTH
+        String birthMonthInput;
+        while (true) {
+            System.out.print("Birth Month: ");
+            birthMonthInput = sc.nextLine();
+            if (!birthMonthInput.trim().isEmpty()) break;
+            else System.out.println("Invalid! Cannot be empty.");
+        }
+
+        // CIVIL STATUS
+        String civilStatusInput;
+        while (true) {
+            System.out.print("Civil Status (Single/Married/Widow): ");
+            civilStatusInput = sc.nextLine();
+            if (!civilStatusInput.trim().isEmpty()) break;
+            else System.out.println("Invalid! Cannot be empty.");
+        }
+
+        // ADDRESS
+        String addressInput;
+        while (true) {
+            System.out.print("Address: ");
+            addressInput = sc.nextLine();
+            if (!addressInput.trim().isEmpty()) break;
+            else System.out.println("Invalid! Cannot be empty.");
+        }
+
+        // CONTACT NUMBER
+        String contactInput;
+        while (true) {
+            System.out.print("Contact Number (09XXXXXXXXX): ");
+            contactInput = sc.nextLine();
+            if (contactInput.matches("^09\\d{9}$")) {
+                break;
+            } else {
+                System.out.println("Invalid! Must be 11 digits and start with 09.");
+            }
+        }
     
         System.out.println("\n=== RESIDENT PROFILE ===");
         System.out.println("│ Name: " + fullName);
@@ -94,6 +146,7 @@ public class BarangayCugmanSystem {
         System.out.println("│ Birth Month: " + birthMonthInput);
         System.out.println("│ Civil Status: " + civilStatusInput);
         System.out.println("│ Address: " + addressInput);
+        System.out.println("│ Contact: " + contactInput);
         System.out.println("└───────────────");
         System.out.println("Hi " + fullName + "! Welcome!");
         
@@ -103,8 +156,8 @@ public class BarangayCugmanSystem {
         birthMonths.add(birthMonthInput);
         civilStatuses.add(civilStatusInput);
         addresses.add(addressInput);
+        contacts.add(contactInput);
         
-        // Resident menu loop
         while (true) {
             System.out.println("\nRESIDENT MENU:");
             System.out.println("1. Request document");
@@ -131,15 +184,11 @@ public class BarangayCugmanSystem {
         int choice = readInt();
         String doc;
         
-        if (choice == 1) {
-            doc = "Barangay Clearance";
-        } else if (choice == 2) {
-            doc = "Barangay Permit";
-        } else if (choice == 3) {
-            doc = "Certificate of Residency";
-        } else if (choice == 4) {
-            doc = "Certificate of Indigency";
-        } else {
+        if (choice == 1) doc = "Barangay Clearance";
+        else if (choice == 2) doc = "Barangay Permit";
+        else if (choice == 3) doc = "Certificate of Residency";
+        else if (choice == 4) doc = "Certificate of Indigency";
+        else {
             System.out.println("Invalid choice!");
             return;
         }
@@ -155,7 +204,6 @@ public class BarangayCugmanSystem {
         boolean hasRequest = false;
         
         for (int i = 0; i < docs.size(); i++) {
-            // Simple check - last resident's requests
             if (names.size() > 0 && names.get(names.size()-1).equalsIgnoreCase(name)) {
                 System.out.println((i+1) + ". " + name + " - " + docs.get(i) + " - " + status.get(i));
                 hasRequest = true;
@@ -188,7 +236,7 @@ public class BarangayCugmanSystem {
         
         showAll();
         System.out.print("Request number: ");
-        int num = readInt() - 1; // 0-index
+        int num = readInt() - 1;
         
         if (num < 0 || num >= docs.size()) {
             System.out.println("Wrong number!");
