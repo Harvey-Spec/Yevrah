@@ -1,0 +1,221 @@
+import java.util.*;
+
+public class BarangayCugmanSystem {
+    static Scanner sc = new Scanner(System.in);
+    
+    static ArrayList<String> names = new ArrayList<>();
+    static ArrayList<String> ages = new ArrayList<>();
+    static ArrayList<String> genders = new ArrayList<>();
+    static ArrayList<String> birthMonths = new ArrayList<>();
+    static ArrayList<String> civilStatuses = new ArrayList<>();
+    static ArrayList<String> addresses = new ArrayList<>();
+    static ArrayList<String> docs = new ArrayList<>();
+    static ArrayList<String> status = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n=== BARANGAY SYSTEM ===");
+            System.out.println("1. Admin Login");
+            System.out.println("2. Resident");
+            System.out.println("3. Exit Program");
+            System.out.print("Choose: ");
+            
+            int choice = readInt();
+            
+            if (choice == 3) {
+                System.out.println("System Closed");
+                break;
+            }
+            
+            if (choice == 1) {
+                adminMenu();
+            } else if (choice == 2) {
+                residentMenu();
+            }
+        }
+    }
+    
+    static void adminMenu() {
+        System.out.print("Username: ");
+        String user = sc.nextLine();
+        System.out.print("Password: ");
+        String pass = sc.nextLine();
+        
+        if (user.equals("Admin") && pass.equals("1234")) {
+            adminWork();
+        } else {
+            System.out.println("Invalid Login, Try Again!");
+        }
+    }
+    
+    static void adminWork() {
+        System.out.println("Logged in as ADMIN!");
+        
+        while (true) {
+            System.out.println("\nADMIN MENU:");
+            System.out.println("1. View all requests");
+            System.out.println("2. Update status");
+            System.out.println("3. Logout");
+            System.out.print("Choose: ");
+            
+            int choice = readInt();
+            
+            if (choice == 1) showAll();
+            else if (choice == 2) updateStatus();
+            else if (choice == 3) return;
+        }
+    }
+    
+    static void residentMenu() {
+        System.out.println("=== RESIDENT REGISTRATION ===");
+        
+        System.out.print("Full Name: ");
+        String fullName = sc.nextLine();
+        
+        System.out.print("Age: ");
+        String ageInput = sc.nextLine();
+        
+        System.out.print("Gender (Male/Female): ");
+        String genderInput = sc.nextLine();
+        
+        System.out.print("Birth Month: ");
+        String birthMonthInput = sc.nextLine();
+        
+        System.out.print("Civil Status (Single/Married/Widow): ");
+        String civilStatusInput = sc.nextLine();
+        
+        System.out.print("Address: ");
+        String addressInput = sc.nextLine();
+    
+        System.out.println("\n=== RESIDENT PROFILE ===");
+        System.out.println("│ Name: " + fullName);
+        System.out.println("│ Age: " + ageInput);
+        System.out.println("│ Gender: " + genderInput);
+        System.out.println("│ Birth Month: " + birthMonthInput);
+        System.out.println("│ Civil Status: " + civilStatusInput);
+        System.out.println("│ Address: " + addressInput);
+        System.out.println("└───────────────");
+        System.out.println("Hi " + fullName + "! Welcome!");
+        
+        names.add(fullName);
+        ages.add(ageInput);
+        genders.add(genderInput);
+        birthMonths.add(birthMonthInput);
+        civilStatuses.add(civilStatusInput);
+        addresses.add(addressInput);
+        
+        // Resident menu loop
+        while (true) {
+            System.out.println("\nRESIDENT MENU:");
+            System.out.println("1. Request document");
+            System.out.println("2. My requests");
+            System.out.println("3. Exit");
+            System.out.print("Choose: ");
+            
+            int choice = readInt();
+            
+            if (choice == 1) requestDoc(fullName);
+            else if (choice == 2) showMyRequests(fullName);
+            else if (choice == 3) return;
+        }
+    }
+    
+    static void requestDoc(String name) {
+        System.out.println("\n=== REQUEST DOCUMENT ===");
+        System.out.println("1. Barangay Clearance");
+        System.out.println("2. Barangay Permit");
+        System.out.println("3. Certificate of Residency");
+        System.out.println("4. Certificate of Indigency");
+        System.out.print("Choose: ");
+        
+        int choice = readInt();
+        String doc;
+        
+        if (choice == 1) {
+            doc = "Barangay Clearance";
+        } else if (choice == 2) {
+            doc = "Barangay Permit";
+        } else if (choice == 3) {
+            doc = "Certificate of Residency";
+        } else if (choice == 4) {
+            doc = "Certificate of Indigency";
+        } else {
+            System.out.println("Invalid choice!");
+            return;
+        }
+        
+        docs.add(doc);
+        status.add("Pending");
+        
+        System.out.println("✓ " + doc + " request sent!");
+    }
+    
+    static void showMyRequests(String name) {
+        System.out.println("\n=== MY REQUESTS (" + name + ") ===");
+        boolean hasRequest = false;
+        
+        for (int i = 0; i < docs.size(); i++) {
+            // Simple check - last resident's requests
+            if (names.size() > 0 && names.get(names.size()-1).equalsIgnoreCase(name)) {
+                System.out.println((i+1) + ". " + name + " - " + docs.get(i) + " - " + status.get(i));
+                hasRequest = true;
+            }
+        }
+        if (!hasRequest) {
+            System.out.println("No requests yet.");
+        }
+    }
+    
+    static void showAll() {
+        if (docs.isEmpty()) {
+            System.out.println("No requests.");
+            return;
+        }
+        
+        System.out.println("\n=== ALL REQUESTS ===");
+        for (int i = 0; i < docs.size(); i++) {
+            System.out.println((i+1) + ". " + names.get(names.size()-1) + " - " + docs.get(i) + " - " + status.get(i));
+        }
+        System.out.println("Press Enter to continue...");
+        sc.nextLine();
+    }
+    
+    static void updateStatus() {
+        if (docs.isEmpty()) {
+            System.out.println("No requests.");
+            return;
+        }
+        
+        showAll();
+        System.out.print("Request number: ");
+        int num = readInt() - 1; // 0-index
+        
+        if (num < 0 || num >= docs.size()) {
+            System.out.println("Wrong number!");
+            return;
+        }
+        
+        System.out.println("1. Approved  2. Rejected ");
+        System.out.print("Choose: ");
+        int choice = readInt();
+        
+        if (choice == 1) status.set(num, "Approved");
+        else if (choice == 2) status.set(num, "Rejected");
+        else {
+            System.out.println("Wrong choice!");
+            return;
+        }
+        
+        System.out.println("Updated!");
+    }
+    
+    static int readInt() {
+        while (true) {
+            try {
+                return Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                System.out.print("Enter number only: ");
+            }
+        }
+    }
+}
