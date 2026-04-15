@@ -1,4 +1,6 @@
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BarangayCugmanSystem {
     static Scanner sc = new Scanner(System.in);
@@ -15,7 +17,9 @@ public class BarangayCugmanSystem {
     static ArrayList<String> contacts = new ArrayList<>();
     
     static ArrayList<String> docs = new ArrayList<>();
+    static ArrayList<String> reasons = new ArrayList<>();
     static ArrayList<String> status = new ArrayList<>();
+    static ArrayList<String> dateRequested = new ArrayList<>();
     static ArrayList<Integer> ownerIndex = new ArrayList<>();
     
     public static void main(String[] args) {
@@ -29,7 +33,6 @@ public class BarangayCugmanSystem {
             int choice = readInt();
             
             if (choice == 3) break;
-            
             if (choice == 1) adminMenu();
             else if (choice == 2) residentPortal();
         }
@@ -65,7 +68,7 @@ public class BarangayCugmanSystem {
         }
     }
 
-    // ================= RESIDENT PORTAL =================
+    // ================= RESIDENT =================
     static void residentPortal() {
         while (true) {
             System.out.println("\nRESIDENT PORTAL:");
@@ -91,7 +94,7 @@ public class BarangayCugmanSystem {
             System.out.print("Full Name: ");
             fullName = sc.nextLine();
             if (fullName.trim().isEmpty()) {
-                System.out.println("Invalid! Name cannot be empty.");
+                System.out.println("Invalid!");
             } 
             else if (!fullName.matches("[a-zA-Z .-]+")) {
                 System.out.println("Invalid! Only letters, spaces, dot (.), and hyphen (-) allowed.");
@@ -171,11 +174,15 @@ public class BarangayCugmanSystem {
         System.out.println("Registered successfully!");
     }
 
-    // ================= LOGIN (UPDATED) =================
+    // ================= LOGIN =================
     static void loginResident() {
+        if (usernames.isEmpty()) {
+            System.out.println("No registered users yet. Please register first.");
+            return;
+        }
+
         int index;
 
-        // USERNAME LOOP
         while (true) {
             System.out.print("Username: ");
             String user = sc.nextLine();
@@ -183,10 +190,9 @@ public class BarangayCugmanSystem {
             index = usernames.indexOf(user);
 
             if (index != -1) break;
-            else System.out.println("Invalid username! Try again.");
+            else System.out.println("Invalid username!");
         }
 
-        // PASSWORD LOOP
         while (true) {
             System.out.print("Password: ");
             String pass = sc.nextLine();
@@ -196,7 +202,7 @@ public class BarangayCugmanSystem {
                 residentMenu(index);
                 return;
             } else {
-                System.out.println("Wrong password! Try again.");
+                System.out.println("Wrong password!");
             }
         }
     }
@@ -207,19 +213,22 @@ public class BarangayCugmanSystem {
             System.out.println("\nRESIDENT MENU:");
             System.out.println("1. Request document");
             System.out.println("2. My requests");
-            System.out.println("3. Logout");
+            System.out.println("3. Claim document");
+            System.out.println("4. Logout");
             System.out.print("Choose: ");
             
             int choice = readInt();
             
             if (choice == 1) requestDoc(index);
             else if (choice == 2) showMyRequests(index);
-            else if (choice == 3) return;
+            else if (choice == 3) claimDocument(index);
+            else if (choice == 4) return;
         }
     }
 
+    // ================= REQUEST =================
     static void requestDoc(int index) {
-        System.out.println("\n1.  Barangay Clearance 2. Barangay Permit 3. Certificate of Residency 4. Certificate of Indigency");
+        System.out.println("\n1. Barangay Clearance\n2. Barangay Permit\n3. Certificate of Residency\n4. Certificate of Indigency");
         int choice = readInt();
 
         String doc = "";
@@ -229,50 +238,125 @@ public class BarangayCugmanSystem {
         else if (choice == 4) doc = "Certificate of Indigency";
         else return;
 
+        System.out.print("Enter reason for request: ");
+        String reason = sc.nextLine();
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String dateTime = LocalDateTime.now().format(dtf);
+
         docs.add(doc);
+        reasons.add(reason);
         status.add("Pending");
+        dateRequested.add(dateTime);
         ownerIndex.add(index);
 
         System.out.println("Request sent!");
     }
 
     static void showMyRequests(int index) {
-        System.out.println("\n=== MY REQUESTS ===");
+        boolean found = false;
+
         for (int i = 0; i < docs.size(); i++) {
             if (ownerIndex.get(i) == index) {
-                System.out.println((i+1) + ". " + docs.get(i) + " - " + status.get(i));
+                System.out.println("\n" + (i+1) + ". " + docs.get(i));
+                System.out.println("Reason: " + reasons.get(i));
+                System.out.println("Date: " + dateRequested.get(i));
+                System.out.println("Status: " + status.get(i));
+                found = true;
             }
         }
+
+        if (!found) System.out.println("No requests.");
     }
 
+    // ================= CLAIM =================
+    static void claimDocument(int index) {
+        boolean found = false;
+
+        for (int i = 0; i < docs.size(); i++) {
+            if (ownerIndex.get(i) == index && status.get(i).equals("Approved")) {
+                System.out.println((i+1) + ". " + docs.get(i));
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No approved documents.");
+            return;
+        }
+
+        System.out.print("Enter number: ");
+        int num = readInt() - 1;
+
+        if (num < 0 || num >= docs.size() || ownerIndex.get(num) != index) {
+            System.out.println("Invalid.");
+            return;
+        }
+
+        if (!status.get(num).equals("Approved")) {
+            System.out.println("Not approved.");
+            return;
+        }
+
+        status.set(num, "Claimed");
+
+        System.out.println("✅ Claimed!");
+        System.out.println("Get from: HARVEY or JUNREY at Barangay Hall.");
+    }
+
+    // ================= ADMIN VIEW =================
     static void showAll() {
+        if (docs.isEmpty()) {
+            System.out.println("No requests.");
+            return;
+        }
+
         for (int i = 0; i < docs.size(); i++) {
             int idx = ownerIndex.get(i);
-
-            System.out.println("\nRequest #" + (i+1));
+            System.out.println("\n#" + (i+1));
             System.out.println("Name: " + names.get(idx));
-            System.out.println("Address: " + addresses.get(idx));
             System.out.println("Document: " + docs.get(i));
+            System.out.println("Reason: " + reasons.get(i));
+            System.out.println("Date: " + dateRequested.get(i));
             System.out.println("Status: " + status.get(i));
-
-            if (addresses.get(idx).toLowerCase().contains("cugman")) {
-                System.out.println("✔ VALID RESIDENT");
-            }
         }
     }
 
     static void updateStatus() {
-        showAll();
-        System.out.print("Request number: ");
-        int num = readInt() - 1;
+        if (docs.isEmpty()) {
+            System.out.println("No requests.");
+            return;
+        }
 
-        if (num < 0 || num >= docs.size()) return;
+        showAll();
+        System.out.print("Enter request number (0 to exit): ");
+        int num = readInt();
+
+        if (num == 0) return;
+
+        num--;
+
+        if (num < 0 || num >= docs.size()) {
+            System.out.println("Invalid number.");
+            return;
+        }
+
+        if (status.get(num).equals("Claimed")) {
+            System.out.println("This document is already CLAIMED. Cannot update.");
+            return;
+        }
 
         System.out.println("1. Approve  2. Reject");
         int choice = readInt();
 
-        if (choice == 1) status.set(num, "Approved");
-        else if (choice == 2) status.set(num, "Rejected");
+        if (choice == 1) {
+            status.set(num, "Approved");
+            System.out.println("✅ Approved!");
+        } 
+        else if (choice == 2) {
+            status.set(num, "Rejected");
+            System.out.println("❌ Rejected!");
+        }
     }
 
     static int readInt() {
@@ -280,7 +364,7 @@ public class BarangayCugmanSystem {
             try {
                 return Integer.parseInt(sc.nextLine());
             } catch (Exception e) {
-                System.out.print("Enter number only: ");
+                System.out.print("Enter number: ");
             }
         }
     }
